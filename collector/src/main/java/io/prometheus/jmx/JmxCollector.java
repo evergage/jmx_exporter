@@ -69,7 +69,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
 
     private final JmxMBeanPropertyCache jmxMBeanPropertyCache = new JmxMBeanPropertyCache();
     private final RulePatternCache rulePatternCache = new RulePatternCache();
-
+    
     public JmxCollector(File in) throws IOException, MalformedObjectNameException {
         configFile = in;
         config = loadConfig((Map<String, Object>)new Yaml().load(new FileReader(in)));

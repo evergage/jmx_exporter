@@ -2,13 +2,8 @@ package io.prometheus.jmx;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
