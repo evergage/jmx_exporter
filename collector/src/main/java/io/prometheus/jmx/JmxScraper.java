@@ -2,6 +2,8 @@ package io.prometheus.jmx;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
