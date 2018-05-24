@@ -68,6 +68,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
     private long createTimeNanoSecs = System.nanoTime();
 
     private final JmxMBeanPropertyCache jmxMBeanPropertyCache = new JmxMBeanPropertyCache();
+    private final RulePatternCache rulePatternCache = new RulePatternCache();
 
     public JmxCollector(File in) throws IOException, MalformedObjectNameException {
         configFile = in;
@@ -337,6 +338,18 @@ public class JmxCollector extends Collector implements Collector.Describable {
           type, help);
       }
 
+      String toSnakeCase(String attrName) {
+        StringBuilder resultBuilder = new StringBuilder(attrName.substring(0,1).toLowerCase());
+        for (char attrChar : attrName.substring(1).toCharArray()) {
+          if (Character.isUpperCase(attrChar)) {
+            resultBuilder.append("_").append(Character.toLowerCase(attrChar));
+          } else {
+            resultBuilder.append(attrChar);
+          }
+        }
+        return resultBuilder.toString();
+      }
+
       public void recordBean(
           String domain,
           LinkedHashMap<String, String> beanProperties,
@@ -355,23 +368,13 @@ public class JmxCollector extends Collector implements Collector.Describable {
           Matcher matcher = null;
           String matchName = beanName + (rule.attrNameSnakeCase ? attrNameSnakeCase : attrName);
           if (rule.pattern != null) {
-            matcher = rule.pattern.matcher(matchName + ": " + beanValue);
-            if (!matcher.matches()) {
-              continue;
+            if (!rulePatternCache.checkAndStoreMatchName(rule.pattern, matchName + ": ")) {
+                continue;
             }
+            matcher = rulePatternCache.getMatcher(rule.pattern, matchName + ": ");
           }
 
           Number value;
-          if (rule.value != null && !rule.value.isEmpty()) {
-            String val = matcher.replaceAll(rule.value);
-
-            try {
-              beanValue = Double.valueOf(val);
-            } catch (NumberFormatException e) {
-              LOGGER.fine("Unable to parse configured value '" + val + "' to number for bean: " + beanName + attrName + ": " + beanValue);
-              return;
-            }
-          }
           if (beanValue instanceof Number) {
             value = ((Number)beanValue).doubleValue() * rule.valueFactor;
           } else if (beanValue instanceof Boolean) {
